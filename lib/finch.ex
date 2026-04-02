@@ -143,7 +143,7 @@ defmodule Finch do
           default: :infinity
         ],
         max_connection_age_jitter: [
-          type: :timeout,
+          type: :non_neg_integer,
           doc: """
           Random jitter in milliseconds added to `:max_connection_age`. Prevents multiple \
           pool shards from draining simultaneously (thundering-herd). The actual age used is \

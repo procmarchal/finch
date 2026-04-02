@@ -1010,13 +1010,14 @@ defmodule Finch.HTTP2.Pool do
 
   defp connection_age_action(%{max_connection_age: :infinity}), do: []
 
-  defp connection_age_action(data) do
-    jitter =
-      if data.max_connection_age_jitter > 0,
-        do: :rand.uniform(data.max_connection_age_jitter),
-        else: 0
+  defp connection_age_action(%{max_connection_age_jitter: jitter} = data)
+       when is_integer(jitter) and jitter > 0 do
+    jitter_value = :rand.uniform(jitter)
+    [{{:timeout, :max_connection_age}, data.max_connection_age + jitter_value, nil}]
+  end
 
-    [{{:timeout, :max_connection_age}, data.max_connection_age + jitter, nil}]
+  defp connection_age_action(data) do
+    [{{:timeout, :max_connection_age}, data.max_connection_age, nil}]
   end
 
   defp reply(%{from: nil, from_pid: pid, request_ref: request_ref}, reply) do
